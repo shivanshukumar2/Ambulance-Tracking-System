@@ -1,49 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ambulance Live Tracker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<title>🚑 Smart Ambulance Tracking System</title>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <style>
-        body{
-            margin:0;
-            font-family:Arial;
-        }
+<style>
 
-        #map{
-            height:100vh;
-            width:100%;
-        }
-    </style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+}
+
+header{
+background:#d32f2f;
+color:white;
+padding:15px;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+}
+
+#info{
+display:flex;
+justify-content:space-around;
+background:white;
+padding:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.2);
+flex-wrap:wrap;
+}
+
+.card{
+text-align:center;
+padding:10px;
+}
+
+.card h3{
+margin:0;
+color:#d32f2f;
+}
+
+.card p{
+margin:5px;
+font-size:18px;
+}
+
+#map{
+height:80vh;
+width:100%;
+}
+
+</style>
+
 </head>
 
 <body>
+
+<header>
+🚑 Smart Ambulance Tracking System
+</header>
+
+<div id="info">
+
+<div class="card">
+<h3>Status</h3>
+<p id="status">Offline</p>
+</div>
+
+<div class="card">
+<h3>Speed</h3>
+<p id="speed">0 km/h</p>
+</div>
+
+<div class="card">
+<h3>Latitude</h3>
+<p id="lat">0</p>
+</div>
+
+<div class="card">
+<h3>Longitude</h3>
+<p id="lon">0</p>
+</div>
+
+</div>
 
 <div id="map"></div>
 
 <script>
 
-var map=L.map('map').setView([20.5937,78.9629],5);
+// India Center
+var map = L.map('map').setView([20.5937,78.9629],5);
 
+// OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'OpenStreetMap'
+    attribution:'© OpenStreetMap'
 }).addTo(map);
 
-var marker=L.marker([20.5937,78.9629]).addTo(map);
+// Ambulance Marker
+var marker = L.marker([20.5937,78.9629]).addTo(map);
+
+let firstLoad = true;
 
 async function updateLocation(){
 
-let response=await fetch("/get_location");
+try{
 
-let data=await response.json();
+let response = await fetch("/get_location");
+let data = await response.json();
+
+document.getElementById("status").innerHTML=data.status;
+document.getElementById("speed").innerHTML=data.speed+" km/h";
+document.getElementById("lat").innerHTML=data.latitude;
+document.getElementById("lon").innerHTML=data.longitude;
 
 marker.setLatLng([data.latitude,data.longitude]);
 
-map.setView([data.latitude,data.longitude],16);
+// केवल पहली बार Map Center होगा
+if(firstLoad){
+
+map.setView([data.latitude,data.longitude],15);
+
+firstLoad=false;
+
+}
+
+}catch(e){
+
+console.log(e);
+
+}
 
 }
 
