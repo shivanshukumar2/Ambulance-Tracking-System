@@ -1,16 +1,20 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Temporary location storage
 ambulance_location = {
-    "latitude": 0,
-    "longitude": 0
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "speed": 0,
+    "status": "Offline"
 }
 
 @app.route("/")
 def home():
-    return "Ambulance Tracking Server Running"
+    return "🚑 Ambulance Tracking Server Running"
 
 @app.route("/update_location", methods=["POST"])
 def update_location():
@@ -18,17 +22,27 @@ def update_location():
 
     data = request.get_json()
 
-    ambulance_location["latitude"] = data["latitude"]
-    ambulance_location["longitude"] = data["longitude"]
+    ambulance_location["latitude"] = data.get("latitude", 0.0)
+    ambulance_location["longitude"] = data.get("longitude", 0.0)
+    ambulance_location["speed"] = data.get("speed", 0)
+    ambulance_location["status"] = "Online"
 
     return jsonify({
-        "status": "success",
-        "message": "Location Updated"
+        "success": True,
+        "message": "Location Updated Successfully",
+        "data": ambulance_location
     })
 
-@app.route("/get_location")
+@app.route("/get_location", methods=["GET"])
 def get_location():
     return jsonify(ambulance_location)
+
+@app.route("/status", methods=["GET"])
+def status():
+    return jsonify({
+        "server": "Running",
+        "ambulance_status": ambulance_location["status"]
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
