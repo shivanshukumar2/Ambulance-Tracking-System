@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ambulance Live Tracker</title>
+
+    <link rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        body{
+            margin:0;
+            font-family:Arial;
+        }
+
+        #map{
+            height:100vh;
+            width:100%;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script>
+
+var map=L.map('map').setView([20.5937,78.9629],5);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'OpenStreetMap'
+}).addTo(map);
+
+var marker=L.marker([20.5937,78.9629]).addTo(map);
+
+async function updateLocation(){
+
+let response=await fetch("/get_location");
+
+let data=await response.json();
+
+marker.setLatLng([data.latitude,data.longitude]);
+
+map.setView([data.latitude,data.longitude],16);
+
+}
+
+setInterval(updateLocation,5000);
+
+updateLocation();
+
+</script>
+
+</body>
+</html>
