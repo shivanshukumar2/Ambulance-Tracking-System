@@ -4,7 +4,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Temporary location storage
 ambulance_location = {
     "latitude": 28.6139,
     "longitude": 77.2090,
@@ -12,13 +11,17 @@ ambulance_location = {
     "status": "Offline"
 }
 
-# Home Page
+# Dashboard
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# Driver Page
+@app.route("/driver")
+def driver():
+    return render_template("driver.html")
 
-# Update Ambulance Location
+# Update Location
 @app.route("/update_location", methods=["POST"])
 def update_location():
     global ambulance_location
@@ -33,25 +36,22 @@ def update_location():
 
     return jsonify({
         "success": True,
-        "message": "Location Updated Successfully",
+        "message": "Location Updated",
         "data": ambulance_location
     })
 
-
-# Get Current Location
-@app.route("/get_location", methods=["GET"])
+# Get Location
+@app.route("/get_location")
 def get_location():
     return jsonify(ambulance_location)
 
-
-# Server Status
-@app.route("/status", methods=["GET"])
+# Status
+@app.route("/status")
 def status():
     return jsonify({
         "server": "Running",
         "ambulance_status": ambulance_location["status"]
     })
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
