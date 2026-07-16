@@ -12,7 +12,7 @@ ambulance_location = {
     "status": "Offline"
 }
 
-# Home Page (Map)
+# Home Page
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -25,10 +25,11 @@ def update_location():
 
     data = request.get_json()
 
-    ambulance_location["latitude"] = data.get("latitude", ambulance_location["latitude"])
-    ambulance_location["longitude"] = data.get("longitude", ambulance_location["longitude"])
-    ambulance_location["speed"] = data.get("speed", 0)
-    ambulance_location["status"] = "Online"
+    if data:
+        ambulance_location["latitude"] = data.get("latitude", ambulance_location["latitude"])
+        ambulance_location["longitude"] = data.get("longitude", ambulance_location["longitude"])
+        ambulance_location["speed"] = data.get("speed", 0)
+        ambulance_location["status"] = "Online"
 
     return jsonify({
         "success": True,
